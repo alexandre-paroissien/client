@@ -78,7 +78,7 @@ func assertHighSeqFromServer(t *testing.T, tc libkb.TestContext, teamID *keybase
 	links, err := rawTeam.unpackLinks(context.TODO())
 	require.NoError(t, err)
 	actualHighSeq := links[0].outerLink.HighSeqno
-	require.Equal(t, expectedHigh, actualHighSeq)
+	require.Equal(t, expectedHigh, *actualHighSeq)
 }
 
 func TestTeamSigChainHighLinks(t *testing.T) {

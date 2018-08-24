@@ -346,21 +346,18 @@ func (arg ProofMetadata) ToJSON(m MetaContext) (ret *jsonw.Wrapper, err error) {
 	ret.SetKey("seqno", jsonw.NewInt64(int64(seqno)))
 	ret.SetKey("prev", prev)
 
-	if arg.HPrevInfo != nil {
-		hPrevInfo := jsonw.NewDictionary()
-		if arg.HPrevInfo.IsEmpty() {
-			hPrevInfo.SetKey("hash", jsonw.NewNil())
-			hPrevInfo.SetKey("seqno", jsonw.NewInt64(int64(0)))
-		} else {
-			hPrevHash := jsonw.NewString(arg.HPrevInfo.HighPrev.String())
-			hPrevInfo.SetKey("hash", hPrevHash)
-			hPrevInfo.SetKey("seqno", jsonw.NewInt64(int64(arg.HPrevInfo.HighSeqNo)))
-		}
-		ret.SetKey("hprev_info", hPrevInfo)
+	hPrevInfo := jsonw.NewDictionary()
+	if arg.HPrevInfo == nil || arg.HPrevInfo.IsEmpty() {
+		// this could be a root node or if no high set pointers are known yet
+		// or a user sigchain node for which high pointers aren't a thing yet
+		hPrevInfo.SetKey("hash", jsonw.NewNil())
+		hPrevInfo.SetKey("seqno", jsonw.NewInt64(int64(0)))
 	} else {
-		// high set pointers are not fully rolled out yet
-		// i.e. for user sigchains
+		hPrevHash := jsonw.NewString(arg.HPrevInfo.HighPrev.String())
+		hPrevInfo.SetKey("hash", hPrevHash)
+		hPrevInfo.SetKey("seqno", jsonw.NewInt64(int64(arg.HPrevInfo.HighSeqNo)))
 	}
+	ret.SetKey("hprev_info", hPrevInfo)
 
 	if arg.IgnoreIfUnsupported {
 		ret.SetKey("ignore_if_unsupported", jsonw.NewBool(true))
